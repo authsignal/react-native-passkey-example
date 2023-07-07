@@ -23,6 +23,9 @@ export function LoginScreen({navigation}: any) {
       return false;
     }
 
+    // Send the token returned by the Authsignal SDK to your backend and validate it
+    // If valid then create a logged-in session for the user however you like
+    // This example simply returns a mock session token
     const {sessionToken, error} = await post('/session', {token});
 
     const success = sessionToken && !error;
@@ -41,8 +44,7 @@ export function LoginScreen({navigation}: any) {
       authsignal.passkey
         .signIn({autofill: true})
         .then(({data, error}) => !error && createSession(data))
-        .then(success => success && navigation.navigate('Home'))
-        .catch(error => showError(error));
+        .then(success => success && navigation.navigate('Home'));
     }
 
     return () => {
