@@ -10,7 +10,7 @@ const app = express();
 const port = 3030;
 
 const secret = 'YOUR_SECRET_KEY';
-const apiBaseUrl = 'https://au-signal.authsignal.com/v1'; // CHANGE FOR YOUR REGION
+const apiBaseUrl = 'https://signal.authsignal.com/v1'; // CHANGE FOR YOUR REGION
 
 const authsignal = new Authsignal({secret, apiBaseUrl});
 
@@ -52,10 +52,6 @@ app.post('/sign-in', async (req, res) => {
 
 app.post('/session', async (req, res) => {
   const token = req.body.token;
-
-  if (!token) {
-    return res.status(401).send({error: 'token is required'});
-  }
 
   const {state} = await authsignal.validateChallenge({token});
 
