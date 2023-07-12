@@ -3,31 +3,34 @@ import bodyParser from 'body-parser';
 import express from 'express';
 import {JsonDB, Config} from 'node-json-db';
 import {v4} from 'uuid';
+import {authsignalSecretKey, authsignalServerURL} from '../config.mjs';
 
 const db = new JsonDB(new Config('user-db'));
 
 const app = express();
 const port = 3030;
 
-const secret = 'YOUR_SECRET_KEY';
-const apiBaseUrl = 'https://signal.authsignal.com/v1'; // CHANGE FOR YOUR REGION
+const authsignalArgs = {
+  secret: authsignalSecretKey,
+  apiBaseUrl: authsignalServerURL,
+};
 
-const authsignal = new Authsignal({secret, apiBaseUrl});
+const authsignal = new Authsignal(authsignalArgs);
 
 app.use(bodyParser.json());
 
 app.post('/sign-up', async (req, res) => {
-  const email = req.body.email;
+  const {userName} = req.body;
 
-  const exists = await db.exists(`/users/${email}`);
+  const exists = await db.exists(`/users/${userName}`);
 
   if (exists) {
     return res.status(400).send({error: 'user already exists'});
   }
 
-  const user = {id: v4(), email};
+  const user = {id: v4(), userName};
 
-  await db.push(`/users/${email}`, user);
+  await db.push(`/users/${userName}`, userName);
 
   const {token} = await authsignal.track({action: 'signUp', userId: user.id});
 
@@ -35,15 +38,15 @@ app.post('/sign-up', async (req, res) => {
 });
 
 app.post('/sign-in', async (req, res) => {
-  const email = req.body.email;
+  const {userName} = req.body;
 
-  const exists = await db.exists(`/users/${email}`);
+  const exists = await db.exists(`/users/${userName}`);
 
   if (!exists) {
     return res.status(404).send({error: 'user not found'});
   }
 
-  const user = await db.getData(`/users/${email}`);
+  const user = await db.getData(`/users/${userName}`);
 
   const {token} = await authsignal.track({action: 'signIn', userId: user.id});
 

@@ -1,6 +1,9 @@
 import {Authsignal} from 'react-native-authsignal';
+import {authsignalClientURL, authsignalTenantID} from '../config.mjs';
 
-const tenantID = 'YOUR_TENANT_ID';
-const baseURL = 'https://challenge.authsignal.com/v1'; // CHANGE FOR YOUR REGION
+const authsignalArgs = {
+  tenantID: authsignalTenantID,
+  baseURL: authsignalClientURL,
+};
 
-export const authsignal = new Authsignal({tenantID, baseURL});
+export const authsignal = new Authsignal(authsignalArgs);

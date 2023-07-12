@@ -16,7 +16,7 @@ import {post} from '../api';
 import {authsignal} from '../authsignal';
 
 export function LoginScreen({navigation}: any) {
-  const [email, setEmail] = useState('');
+  const [userName, setUserName] = useState('');
 
   const createSession = async (token?: string) => {
     if (!token) {
@@ -55,13 +55,11 @@ export function LoginScreen({navigation}: any) {
   const onPressSignUp = async () => {
     authsignal.passkey.cancel();
 
-    const {token, error: apiError} = await post('/sign-up', {email});
+    const {token, error: apiError} = await post('/sign-up', {userName});
 
     if (apiError) {
       return showError(apiError);
     }
-
-    const userName = email;
 
     const {data, error} = await authsignal.passkey.signUp({token, userName});
 
@@ -79,7 +77,7 @@ export function LoginScreen({navigation}: any) {
   const onPressSignIn = async () => {
     authsignal.passkey.cancel();
 
-    const {token, error: apiError} = await post('/sign-in', {email});
+    const {token, error: apiError} = await post('/sign-in', {userName});
 
     if (apiError) {
       return showError(apiError);
@@ -103,9 +101,9 @@ export function LoginScreen({navigation}: any) {
       <SafeAreaView style={styles.container}>
         <TextInput
           style={styles.input}
-          placeholder="email"
-          onChangeText={setEmail}
-          value={email}
+          placeholder="username"
+          onChangeText={setUserName}
+          value={userName}
           autoCapitalize={'none'}
           autoCorrect={false}
           textContentType={'username'}
