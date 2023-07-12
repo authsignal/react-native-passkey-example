@@ -1,9 +1,8 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, {useEffect, useState} from 'react';
+import {Auth} from 'aws-amplify';
+import React, {useState} from 'react';
 import {
   Alert,
   Keyboard,
-  Platform,
   SafeAreaView,
   StyleSheet,
   Text,
@@ -12,88 +11,50 @@ import {
 } from 'react-native';
 
 import {Button} from './Button';
-import {post} from '../api';
-import {authsignal} from '../authsignal';
+import {authsignal} from '../config';
+
+let cognitoUser: any;
 
 export function LoginScreen({navigation}: any) {
   const [userName, setUserName] = useState('');
 
-  const createSession = async (token?: string) => {
-    if (!token) {
-      return false;
-    }
-
-    // Send the token returned by the Authsignal SDK to your backend and validate it
-    // If valid then create a logged-in session for the user however you like
-    // This example simply returns a mock session token
-    const {sessionToken, error} = await post('/session', {token});
-
-    const success = sessionToken && !error;
-
-    if (success) {
-      await AsyncStorage.setItem('@session_token', sessionToken);
-    } else {
-      showError(error);
-    }
-
-    return success;
-  };
-
-  useEffect(() => {
-    if (Platform.OS === 'ios') {
-      authsignal.passkey
-        .signIn({autofill: true})
-        .then(({data, error}) => !error && createSession(data))
-        .then(success => success && navigation.navigate('Home'));
-    }
-
-    return () => {
-      authsignal.passkey.cancel();
-    };
-  }, [navigation]);
-
   const onPressSignUp = async () => {
-    authsignal.passkey.cancel();
+    const signUpParams = {
+      username: userName,
+      password: Math.random().toString(36).slice(-16) + 'X',
+    };
 
-    const {token, error: apiError} = await post('/sign-up', {userName});
+    await Auth.signUp(signUpParams);
 
-    if (apiError) {
-      return showError(apiError);
-    }
+    cognitoUser = await Auth.signIn(userName);
+
+    const {token} = cognitoUser.challengeParam;
 
     const {data, error} = await authsignal.passkey.signUp({token, userName});
 
-    if (error) {
-      return showError(error);
+    if (error || !data) {
+      return Alert.alert('Error', error ?? 'Sign up error');
     }
 
-    const success = await createSession(data);
+    await Auth.sendCustomChallengeAnswer(cognitoUser, data);
 
-    if (success) {
-      navigation.navigate('Home');
-    }
+    navigation.navigate('Home');
   };
 
   const onPressSignIn = async () => {
-    authsignal.passkey.cancel();
+    cognitoUser = await Auth.signIn(userName);
 
-    const {token, error: apiError} = await post('/sign-in', {userName});
-
-    if (apiError) {
-      return showError(apiError);
-    }
+    const {token} = cognitoUser.challengeParam;
 
     const {data, error} = await authsignal.passkey.signIn({token});
 
-    if (error) {
-      return showError(error);
+    if (error || !data) {
+      return Alert.alert('Error', error ?? 'Sign in error');
     }
 
-    const success = await createSession(data);
+    await Auth.sendCustomChallengeAnswer(cognitoUser, data);
 
-    if (success) {
-      navigation.navigate('Home');
-    }
+    navigation.navigate('Home');
   };
 
   return (
@@ -106,8 +67,8 @@ export function LoginScreen({navigation}: any) {
           value={userName}
           autoCapitalize={'none'}
           autoCorrect={false}
-          textContentType={'username'}
           autoFocus={false}
+          textContentType={'username'}
         />
         <Button onPress={onPressSignUp}>Sign up</Button>
         <Text>Or</Text>
@@ -134,7 +95,3 @@ const styles = StyleSheet.create({
     padding: 10,
   },
 });
-
-function showError(message: string) {
-  Alert.alert('Error', message);
-}

@@ -1,17 +1,33 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import React from 'react';
+import {Auth} from 'aws-amplify';
+import React, {useEffect, useState} from 'react';
 import {SafeAreaView, StyleSheet, Text, View} from 'react-native';
 
 import {Button} from './Button';
 
 export function HomeScreen({navigation}: any) {
+  const [accessToken, setAccessToken] = useState<string | undefined>();
+
+  useEffect(() => {
+    Auth.currentSession().then(session => {
+      const jwtToken = session?.getAccessToken().getJwtToken();
+
+      setAccessToken(jwtToken);
+    });
+  });
+
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.text}>Signed in</Text>
+      <Text style={styles.header}>Signed in</Text>
+      {accessToken && (
+        <Text
+          style={
+            styles.text
+          }>{`Cognito access token:\n\n ${accessToken}`}</Text>
+      )}
       <View style={styles.buttonContainer}>
         <Button
           onPress={async () => {
-            await AsyncStorage.removeItem('@session_token');
+            await Auth.signOut();
 
             navigation.navigate('Login');
           }}>
@@ -29,11 +45,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     margin: 20,
   },
-  text: {
+  header: {
     marginVertical: 20,
     color: 'black',
     fontSize: 32,
     fontWeight: 'bold',
+  },
+  text: {
+    marginVertical: 20,
+    color: 'black',
+    fontSize: 12,
   },
   buttonContainer: {
     width: '100%',

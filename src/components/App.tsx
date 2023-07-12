@@ -1,6 +1,6 @@
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {Auth} from 'aws-amplify';
 import React, {useEffect, useState} from 'react';
 
 import {HomeScreen} from './HomeScreen';
@@ -10,18 +10,17 @@ const Stack = createStackNavigator();
 
 function App() {
   const [initialized, setInitialized] = useState(false);
-  const [sessionToken, setSessionToken] = useState<string | null>(null);
+  const [accessToken, setAccessToken] = useState<string | undefined>();
 
   useEffect(() => {
-    (async () => {
-      const storedToken = await AsyncStorage.getItem('@session_token');
+    Auth.currentSession()
+      .then(session => {
+        const jwtToken = session?.getAccessToken().getJwtToken();
 
-      if (storedToken) {
-        setSessionToken(storedToken);
-      }
-
-      setInitialized(true);
-    })();
+        setAccessToken(jwtToken);
+      })
+      .catch(() => {})
+      .finally(() => setInitialized(true));
   }, []);
 
   if (!initialized) {
@@ -31,7 +30,7 @@ function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName={sessionToken ? 'Home' : 'Login'}
+        initialRouteName={accessToken ? 'Home' : 'Login'}
         screenOptions={{headerShown: false}}>
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />

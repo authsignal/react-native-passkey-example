@@ -1,0 +1,34 @@
+service: auth
+frameworkVersion: '3'
+
+plugins:
+  - serverless-esbuild
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  environment:
+    AUTHSIGNAL_SECRET: ${env:AUTHSIGNAL_SECRET}
+    AUTHSIGNAL_URL: ${env:AUTHSIGNAL_URL}
+
+package:
+  individually: true
+
+functions:
+  defineAuthChallenge:
+    handler: define-auth-challenge/handler.handler
+
+  createAuthChallenge:
+    handler: create-auth-challenge/handler.handler
+
+  verifyAuthChallengeResponse:
+    handler: verify-auth-challenge-response/handler.handler
+
+  preSignUp:
+    handler: pre-sign-up/handler.handler
+
+useDotenv: true
+
+custom:
+  esbuild:
+    packagePath: ../package.json
