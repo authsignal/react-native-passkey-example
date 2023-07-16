@@ -3,15 +3,15 @@ import {Authsignal} from 'react-native-authsignal';
 
 Amplify.configure({
   Auth: {
-    region: 'us-west-2',
-    userPoolId: 'us-west-2_VkdUWn6a2',
-    userPoolWebClientId: '2cdp2u0h56vo8ikm9vhtq2nsm1',
+    region: 'YOUR_REGION',
+    userPoolId: 'YOUR_USER_POOL_ID',
+    userPoolWebClientId: 'YOUR_USER_POOL_CLIENT_ID',
   },
 });
 
 const authsignalArgs = {
-  tenantID: '921212c3-07e6-4666-a9fe-371cdeb106bc',
-  baseURL: 'https://dev-challenge.authsignal.com/v1',
+  tenantID: 'YOUR_TENANT_ID',
+  baseURL: 'YOUR_REGION_CLIENT_URL',
 };
 
 export const authsignal = new Authsignal(authsignalArgs);
