@@ -30,7 +30,7 @@ app.post('/sign-up', async (req, res) => {
 
   const user = {id: v4(), userName};
 
-  await db.push(`/users/${userName}`, userName);
+  await db.push(`/users/${userName}`, user);
 
   const {token} = await authsignal.track({action: 'signUp', userId: user.id});
 
