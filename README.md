@@ -1,79 +1,144 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Authsignal React Native + AWS Cognito Passkeys Example
 
-# Getting Started
+This example shows how to integrate [Authsignal](https://www.authsignal.com/) with [React Native](https://reactnative.dev/) and [AWS Cognito](https://aws.amazon.com/cognito/).
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+If you're looking for a similar example but for the Web instead of React Native, you can find one [here](https://github.com/authsignal/nextjs-example/tree/with-aws-cognito).
 
-## Step 1: Start the Metro Server
+## Prerequisites
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+You shuld follow the prerequisite steps described [here](https://docs.authsignal.com/sdks/client/react-native#prerequisites) to setup your Relying Party and your `apple-app-site-association` and `assetlinks.json` files.
 
-To start Metro, run the following command from the _root_ of your React Native project:
+## 1. Installation
 
-```bash
-# using npm
-npm start
+Clone the repo on the `with-aws-cognito` branch:
 
-# OR using Yarn
-yarn start
+```
+git clone --branch with-aws-cognito https://github.com/authsignal/react-native-passkey-example
 ```
 
-## Step 2: Start your Application
+Then install dependencies inside the repo:
 
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
-
-### For Android
-
-```bash
-# using npm
-npm run android
-
-# OR using Yarn
-yarn android
+```
+cd react-native-passkey-example
+yarn install
+npx pod-install ios
 ```
 
-### For iOS
+## 2. Configuration
 
-```bash
-# using npm
-npm run ios
+To update the backend configuration used by the lambdas, copy [this file](https://github.com/authsignal/react-native-passkey-example/tree/with-aws-cognito/lambdas/.env.example) and rename it from `.env.example` to `.env` then update it with your secret key and the appropriate URL for your [region](https://docs.authsignal.com/api/server-api#region-selection).
 
-# OR using Yarn
-yarn ios
+To update the client configuration used by the app, copy [this file](https://github.com/authsignal/react-native-passkey-example/blob/with-aws-cognito/.env.local.example) and rename it from `.env.local.example` to `.env.local` then update it with the values for your Cognito user pool and your Authsignal tenant and [region](https://docs.authsignal.com/api/client-api/overview#region-selection).
+
+## 3. The lambda triggers
+
+#### Deploying the lambda triggers
+
+The example repo contains [four lambdas](https://github.com/authsignal/react-native-passkey-example/blob/with-aws-cognito/lambdas) which can be deployed to your AWS environment using [serverless framework](https://www.serverless.com/).
+To deploy these lambdas, clone the [Github repo](https://github.com/authsignal/react-native-passkey-example/tree/with-aws-cognito) and run the following command:
+
+```
+cd lambdas
+npx serverless deploy --region YOUR_REGION
 ```
 
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
+#### Connecting the lambda triggers
 
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
+Once deployed, these lambdas can be connected to your Cognito user pool:
 
-## Step 3: Modifying your App
+![AWS Cognito triggers!](/cognito-triggers.png 'AWS Cognito triggers')
 
-Now that you have successfully run the app, let's modify it.
+#### Create auth challenge lambda
 
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
+This lambda uses the [Authsignal Node.js SDK](https://docs.authsignal.com/sdks/server/node) to return a short-lived token back to the app which can be passed to the [Authsignal Web SDK](https://docs.authsignal.com/sdks/client/browser-sdk) to initiate a passkey challenge:
 
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
+```ts
+export const handler: CreateAuthChallengeTriggerHandler = async event => {
+  const userId = event.request.userAttributes.sub;
 
-## Congratulations! :tada:
+  const {token} = await authsignal.track({action: 'cognitoAuth', userId});
 
-You've successfully run and modified your React Native App. :partying_face:
+  event.response.publicChallengeParameters = {token};
 
-### Now what?
+  return event;
+};
+```
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
+#### Verify auth challenge response lambda
 
-# Troubleshooting
+This lambda takes the result token returned by the [Authsignal Web SDK](https://docs.authsignal.com/sdks/client/browser-sdk) and passes it to the [Authsignal Node.js SDK](https://docs.authsignal.com/sdks/server/node) to validate the result of the challenge:
 
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+```ts
+export const handler: VerifyAuthChallengeResponseTriggerHandler =
+  async event => {
+    const userId = event.request.userAttributes.sub;
+    const token = event.request.challengeAnswer;
 
-# Learn More
+    const {state} = await authsignal.validateChallenge({userId, token});
 
-To learn more about React Native, take a look at the following resources:
+    event.response.answerCorrect = state === 'CHALLENGE_SUCCEEDED';
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+    return event;
+  };
+```
+
+#### Define auth challenge and pre sign up lambdas
+
+These lambdas don't have any interesting interaction with Authsignal but are required to get things working end-to-end. You can find out more info about what they do in [this AWS blog post](https://aws.amazon.com/blogs/mobile/implementing-passwordless-email-authentication-with-amazon-cognito/).
+
+## 4. The app
+
+#### Running the app
+
+To start the app run the following command:
+
+```
+yarn dev
+```
+
+#### Sign up
+
+We use Amplify to begin sign up, which invokes the create auth challenge lambda and receives an initial token as a `challengeParam`.
+We pass this initial token to the Authsignal SDK, which presents the native UI to register a new passkey, and then we pass the result token back to Amplify as the challenge answer.
+
+```ts
+let cognitoUser: any;
+
+const onPressSignUp = async () => {
+  const signUpParams = {
+    username: userName,
+    password: Math.random().toString(36).slice(-16) + 'X',
+  };
+
+  await Auth.signUp(signUpParams);
+
+  cognitoUser = await Auth.signIn(userName);
+
+  const {token} = cognitoUser.challengeParam;
+
+  const {data, error} = await authsignal.passkey.signUp({token, userName});
+
+  await Auth.sendCustomChallengeAnswer(cognitoUser, data);
+};
+```
+
+Similar to the example in [this AWS blog post](https://aws.amazon.com/blogs/mobile/implementing-passwordless-email-authentication-with-amazon-cognito/), a dummy password is randomly generated because Amplify requires one when signing up, but it won't actually be used.
+
+#### Sign in
+
+We use Amplify to begin sign in, which invokes the create auth challenge lambda and receives an initial token as a `challengeParam`.
+We pass this initial token to the Authsignal SDK, which presents the native UI to authenticate with a passkey, and then we pass the result token back to Amplify as the challenge answer.
+
+```ts
+let cognitoUser: any;
+
+const onPressSignIn = async () => {
+  cognitoUser = await Auth.signIn(userName);
+
+  const {token} = cognitoUser.challengeParam;
+
+  const {data, error} = await authsignal.passkey.signIn({token});
+
+  await Auth.sendCustomChallengeAnswer(cognitoUser, data);
+};
+```
