@@ -4,6 +4,8 @@ This example shows how to integrate [Authsignal](https://www.authsignal.com/) wi
 
 If you're looking for a similar example but for the Web instead of React Native, you can find one [here](https://github.com/authsignal/nextjs-example/tree/with-aws-cognito).
 
+This app is referenced in our [official guide](https://docs.authsignal.com/integrations/aws-cognito) on how to integrate Authsignal with AWS Cognito.
+
 ## Prerequisites
 
 You shuld follow the prerequisite steps described [here](https://docs.authsignal.com/sdks/client/react-native#prerequisites) to setup your Relying Party and your `apple-app-site-association` and `assetlinks.json` files.
