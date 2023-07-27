@@ -8,7 +8,7 @@ This app is referenced in our [official guide](https://docs.authsignal.com/integ
 
 ## Prerequisites
 
-You shuld follow the prerequisite steps described [here](https://docs.authsignal.com/sdks/client/react-native#prerequisites) to setup your Relying Party and your `apple-app-site-association` and `assetlinks.json` files.
+You should follow the prerequisite steps described [here](https://docs.authsignal.com/sdks/client/react-native#prerequisites) to setup your Relying Party and your `apple-app-site-association` and `assetlinks.json` files.
 
 ## 1. Installation
 
