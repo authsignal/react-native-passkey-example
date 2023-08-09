@@ -1,5 +1,5 @@
 import {Auth} from 'aws-amplify';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Alert,
   Keyboard,
@@ -9,6 +9,7 @@ import {
   TextInput,
   TouchableWithoutFeedback,
 } from 'react-native';
+import jwtDecode from 'jwt-decode';
 
 import {Button} from './Button';
 import {authsignal} from '../config';
@@ -18,7 +19,25 @@ let cognitoUser: any;
 export function LoginScreen({navigation}: any) {
   const [userName, setUserName] = useState('');
 
+  useEffect(() => {
+    authsignal.passkey.signIn({autofill: true}).then(async ({data}) => {
+      if (!data) {
+        return;
+      }
+
+      const decoded = jwtDecode<any>(data);
+
+      cognitoUser = await Auth.signIn(decoded.other.username);
+
+      await Auth.sendCustomChallengeAnswer(cognitoUser, data);
+
+      navigation.navigate('Home');
+    });
+  });
+
   const onPressSignUp = async () => {
+    authsignal.passkey.cancel();
+
     const signUpParams = {
       username: userName,
       password: Math.random().toString(36).slice(-16) + 'X',
@@ -42,6 +61,8 @@ export function LoginScreen({navigation}: any) {
   };
 
   const onPressSignIn = async () => {
+    authsignal.passkey.cancel();
+
     cognitoUser = await Auth.signIn(userName);
 
     const {token} = cognitoUser.challengeParam;
