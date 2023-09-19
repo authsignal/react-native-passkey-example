@@ -11,7 +11,7 @@ Amplify.configure({
 
 const authsignalArgs = {
   tenantID: 'YOUR_TENANT_ID',
-  baseURL: 'YOUR_REGION_CLIENT_URL',
+  baseURL: 'https://api.authsignal.com/v1', // Change for your region if required
 };
 
 export const authsignal = new Authsignal(authsignalArgs);

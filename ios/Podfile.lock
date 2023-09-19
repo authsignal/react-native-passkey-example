@@ -1,5 +1,5 @@
 PODS:
-  - Authsignal (0.1.10)
+  - Authsignal (0.2.0)
   - boost (1.76.0)
   - CocoaAsyncSocket (7.6.5)
   - DoubleConversion (1.1.6)
@@ -375,8 +375,8 @@ PODS:
   - React-jsinspector (0.72.1)
   - React-logger (0.72.1):
     - glog
-  - react-native-authsignal (0.2.1):
-    - Authsignal (= 0.1.10)
+  - react-native-authsignal (0.3.0):
+    - Authsignal (= 0.2.0)
     - React-Core
   - react-native-netinfo (9.4.1):
     - React-Core
@@ -696,7 +696,7 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
-  Authsignal: c7021d2e4448ae9849304bb90b4eac6c04f313e5
+  Authsignal: 7ee10b064ad347e66c54b4fa72e8a1f936b9f273
   boost: 57d2868c099736d80fcd648bf211b4431e51a558
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
   DoubleConversion: 5189b271737e1565bdce30deb4a08d647e3f5f54
@@ -730,7 +730,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 184eae1ecdedc7a083194bd9ff809c93f08fd34c
   React-jsinspector: d0b5bfd1085599265f4212034321e829bdf83cc0
   React-logger: b8103c9b04e707b50cdd2b1aeb382483900cbb37
-  react-native-authsignal: f83703ca5926ab486877eb77d2545fe857478950
+  react-native-authsignal: 9374b710c358ee41cc54ef5baa39c243d32741d5
   react-native-netinfo: fefd4e98d75cbdd6e85fc530f7111a8afdf2b0c5
   react-native-safe-area-context: 36cc67648134e89465663b8172336a19eeda493d
   React-NativeModulesApple: 4f31a812364443cee6ef768d256c594ad3b20f53

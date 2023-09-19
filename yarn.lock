@@ -9248,10 +9248,10 @@ react-is@^17.0.1:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-17.0.2.tgz#e691d4a8e9c789365655539ab372762b0efb54f0"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
 
-react-native-authsignal@0.2.4:
-  version "0.2.4"
-  resolved "https://registry.yarnpkg.com/react-native-authsignal/-/react-native-authsignal-0.2.4.tgz#13dd3508cb55330202ff7858deeead3f741dbdfb"
-  integrity sha512-jIpViKCX3LRziIVfYdAUsfpEUl321tlb2wV4pPesPASRo+mMLquNSbuE6LMs2OZm1jpXgDW3kt4vFaEO4vv+sQ==
+react-native-authsignal@0.3.1:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/react-native-authsignal/-/react-native-authsignal-0.3.1.tgz#f282d48b70cadba0307caae53be17411c54ddb0b"
+  integrity sha512-yuUQuRuZh2i7qLTtw3al2V82XwwJ7+jwiSbXDgZ/rz9hdQSKNAVmUv8aZpY6YsM13i4FLTv8io/SpowxCaMqiw==
 
 react-native-gesture-handler@^2.12.0:
   version "2.12.0"
