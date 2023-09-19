@@ -1,9 +1,9 @@
 import {Authsignal} from 'react-native-authsignal';
-import {authsignalClientURL, authsignalTenantID} from '../config.mjs';
+import {authsignalURL, authsignalTenantID} from '../config.mjs';
 
 const authsignalArgs = {
   tenantID: authsignalTenantID,
-  baseURL: authsignalClientURL,
+  baseURL: authsignalURL,
 };
 
 export const authsignal = new Authsignal(authsignalArgs);

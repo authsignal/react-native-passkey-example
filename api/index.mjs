@@ -3,7 +3,7 @@ import bodyParser from 'body-parser';
 import express from 'express';
 import {JsonDB, Config} from 'node-json-db';
 import {v4} from 'uuid';
-import {authsignalSecretKey, authsignalServerURL} from '../config.mjs';
+import {authsignalSecretKey, authsignalURL} from '../config.mjs';
 
 const db = new JsonDB(new Config('user-db'));
 
@@ -12,7 +12,7 @@ const port = 3030;
 
 const authsignalArgs = {
   secret: authsignalSecretKey,
-  apiBaseUrl: authsignalServerURL,
+  apiBaseUrl: authsignalURL,
 };
 
 const authsignal = new Authsignal(authsignalArgs);
