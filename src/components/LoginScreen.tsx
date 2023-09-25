@@ -46,10 +46,6 @@ export function LoginScreen({navigation}: any) {
         .then(({data, error}) => !error && createSession(data))
         .then(success => success && navigation.navigate('Home'));
     }
-
-    return () => {
-      authsignal.passkey.cancel();
-    };
   }, [navigation]);
 
   const onPressSignUp = async () => {
