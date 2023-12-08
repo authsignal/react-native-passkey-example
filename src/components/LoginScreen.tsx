@@ -3,6 +3,7 @@ import React, {useEffect, useState} from 'react';
 import {
   Alert,
   Keyboard,
+  Platform,
   SafeAreaView,
   StyleSheet,
   Text,
@@ -20,6 +21,10 @@ export function LoginScreen({navigation}: any) {
   const [userName, setUserName] = useState('');
 
   useEffect(() => {
+    if (Platform.OS !== 'ios') {
+      return;
+    }
+
     authsignal.passkey.signIn({autofill: true}).then(async ({data}) => {
       if (!data) {
         return;
@@ -78,6 +83,26 @@ export function LoginScreen({navigation}: any) {
     navigation.navigate('Home');
   };
 
+  const onFocusUsername = async () => {
+    if (Platform.OS !== 'android') {
+      return;
+    }
+
+    const {data} = await authsignal.passkey.signIn({autofill: true});
+
+    if (!data) {
+      return;
+    }
+
+    const decoded = jwtDecode<any>(data);
+
+    cognitoUser = await Auth.signIn(decoded.other.username);
+
+    await Auth.sendCustomChallengeAnswer(cognitoUser, data);
+
+    navigation.navigate('Home');
+  };
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <SafeAreaView style={styles.container}>
@@ -89,6 +114,7 @@ export function LoginScreen({navigation}: any) {
           autoCapitalize={'none'}
           autoCorrect={false}
           autoFocus={false}
+          autoComplete={'username'}
           textContentType={'username'}
         />
         <Button onPress={onPressSignUp}>Sign up</Button>
