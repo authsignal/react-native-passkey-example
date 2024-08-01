@@ -4,11 +4,12 @@
   "private": true,
   "scripts": {
     "android": "react-native run-android",
-    "ios": "react-native run-ios --simulator='iPhone 14'",
+    "ios": "react-native run-ios --simulator='iPhone 15'",
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",
-    "api": "node api/index.mjs"
+    "api": "node api/index.mjs",
+    "install-ios": "NO_FLIPPER=1 cd ios && pod install"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.18.2",
@@ -17,13 +18,13 @@
     "jwt-decode": "^3.1.2",
     "react": "18.2.0",
     "react-native": "0.72.1",
-    "react-native-authsignal": "^0.3.1",
+    "react-native-authsignal": "^0.3.10",
     "react-native-gesture-handler": "^2.12.0",
     "react-native-safe-area-context": "^4.6.3",
     "react-native-screens": "^3.22.0"
   },
   "devDependencies": {
-    "@authsignal/node": "^0.0.44",
+    "@authsignal/node": "^1.1.2",
     "@babel/core": "^7.20.0",
     "@babel/preset-env": "^7.20.0",
     "@babel/runtime": "^7.20.0",
